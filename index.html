@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MicroCRM Dashboard</title>
-   <script src="https://telegram.org"></script>
+    <script src="https://telegram.org"></script>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -13,7 +13,7 @@
             margin: 0;
             padding: 15px;
         }
-        h2 { margin-bottom: 15px; font-size: 20px; }
+        h2 { margin-top: 20px; margin-bottom: 15px; font-size: 20px; }
 
         /* Виджеты (Сетка) */
         .widgets-grid {
@@ -42,23 +42,25 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         .task-title { font-weight: 500; }
         .task-status {
             font-size: 12px;
-            padding: 4px 8px;
+            padding: 4px 10px;
             border-radius: 20px;
             background: #e1f5fe;
             color: #0288d1;
             cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
         }
-        .status-done { background: #e8f5e9; color: #388e3c; }
+        .task-status.status-done { background: #e8f5e9; color: #388e3c; }
     </style>
 </head>
 <body>
 
     <h2>Сводка за месяц</h2>
-    <!-- Блок интерактивных виджетов -->
     <div class="widgets-grid">
         <div class="widget full-width">
             <div class="widget-title">Выручка (руб)</div>
@@ -79,12 +81,15 @@
         <!-- Сюда JS вставит задачи -->
     </div>
 
-     <script>
+    <script>
+        // Инициализация Telegram WebApp
         const tg = window.Telegram.WebApp;
-        tg.ready();
-        tg.expand();
+        if (tg) {
+            tg.ready();
+            tg.expand();
+        }
 
-        // Имитируем базу данных прямо в приложении для мгновенного теста без туннелей
+        // Данные для локального демо-режима
         let DB = {
             "stats": {"revenue": 45000, "leads": 124, "conversion": 15},
             "tasks": [
@@ -94,13 +99,12 @@
             ]
         };
 
+        // Функция отрисовки интерфейса
         function renderDashboard() {
-            // Заполняем виджеты
             document.getElementById('widget-revenue').innerText = DB.stats.revenue.toLocaleString() + ' ₽';
             document.getElementById('widget-leads').innerText = DB.stats.leads;
             document.getElementById('widget-conv').innerText = DB.stats.conversion + '%';
 
-            // Заполняем задачи
             const listHTML = DB.tasks.map(task => `
                 <div class="task-card">
                     <div class="task-title">${task.title}</div>
@@ -113,16 +117,15 @@
             document.getElementById('tasks-list').innerHTML = listHTML;
         }
 
+        // Функция переключения статуса
         function toggleStatus(id, currentStatus) {
             const nextStatus = currentStatus === 'Выполнено' ? 'В работе' : 'Выполнено';
-            // Меняем статус прямо в памяти
             DB.tasks = DB.tasks.map(task => task.id === id ? {...task, status: nextStatus} : task);
             renderDashboard();
         }
 
-        // Запуск отрисовки
+        // Первый запуск при загрузке страницы
         renderDashboard();
     </script>
 </body>
 </html>
-
